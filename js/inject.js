@@ -34,16 +34,19 @@ function toggle() {
     console.log("togg-on");
     setLocal(STATE_KEY, true);
   }
-  $(setSidebar());
+  setSidebar();
 }
 
 function setSidebar() {
-  var enabled = getLocal(STATE_KEY);
-  if(enabled) {
-    on();
-  } else {
-    off();
+  function _setSidebar() {
+    var enabled = getLocal(STATE_KEY);
+    if(enabled) {
+      on();
+    } else {
+      off();
+    }
   }
+  $(_setSidebar());
 }
 
 function on() {
