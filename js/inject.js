@@ -15,23 +15,23 @@
     resizePage();
     $('#study-guide-sidebar').resizable({
       handles: 'n,w,s,e',
-      minWidth: 200,
-      maxWidth: 500,
+      minWidth: 300,
       resize: function(event, ui) {
         $(this).css({left:''});
         resizePage();
       }
     });
   } else {
-    $(DIV_ID).remove();
+    $('#' + DIV_ID).remove();
   }
   function resizePage() {
-    console.log("resizePage");
+    /*console.log("resizePage");
     console.log($('body').innerWidth());
     console.log($('#' + DIV_ID));
     console.log($('#' + DIV_ID).outerWidth());
     console.log($('body').innerWidth() - $('#' + DIV_ID).outerWidth());
+    */
     $('#' + PAGE_ID).css({width: $('body').innerWidth() - $('#' + DIV_ID).outerWidth()});
-    console.log($('#' + PAGE_ID).css('width'));
+    //console.log($('#' + PAGE_ID).css('width'));
   }
 })()
