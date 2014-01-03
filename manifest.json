@@ -19,8 +19,7 @@
     "js": ["js/libs/jquery.min.js", "js/libs/jquery-ui.min.js", "js/inject.js"]
   }],
   "browser_action": {
-    "default_icon": "images/icon.png",
-    "default_popup": "popup.html"
+    "default_icon": "images/icon.png"
   },
   "web_accessible_resources": [
     "sidebar.html"

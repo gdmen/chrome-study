@@ -1,7 +1,10 @@
 DIV_ID = "study-guide-sidebar";
 PAGE_ID = "study-guide-page";
 
-STATE_KEY = 'study-guide-toggle-';
+STATE_KEY = 'study-guide-toggle';
+
+STARTING_WIDTH = 300;
+MIN_WIDTH = STARTING_WIDTH;
 
 if(!isset(STATE_KEY)) {
   console.log("not set");
@@ -25,11 +28,13 @@ function toggle() {
   console.log("toggle");
   var enabled = getLocal(STATE_KEY);
   if(enabled) {
+    console.log("togg-off");
     setLocal(STATE_KEY, false);
   } else {
+    console.log("togg-on");
     setLocal(STATE_KEY, true);
   }
-  setSidebar();
+  $(setSidebar());
 }
 
 function setSidebar() {
@@ -43,37 +48,47 @@ function setSidebar() {
 
 function on() {
   console.log("on");
-  chrome.runtime.sendMessage({greeting: "inject"}, function(response) {
+    off();
+    chrome.runtime.sendMessage({greeting: "inject"}, function(response) {
+    console.log("CSS INJECTED!");});
     // Inject container
     console.log("injecting?");
     $('body').wrapInner('<div id="' + PAGE_ID + '"/>');
-    
-    iframe = document.createElement('iframe');
-    iframe.src = chrome.extension.getURL('sidebar.html');
     resizable_div = document.createElement("div");
     resizable_div.id = DIV_ID;
-    //resizable_div.appendChild(iframe);
     document.body.appendChild(resizable_div);
+    $('#' + DIV_ID).css({width: STARTING_WIDTH});
     resizePage();
     $('#study-guide-sidebar').resizable({
       handles: 'w',
-      minWidth: 300,
+      minWidth: MIN_WIDTH,
       resize: function(event, ui) {
+        $(this).css({left:''});
+      },
+      stop: function(event, ui) {
         $(this).css({left:''});
         resizePage();
       }
     });
-  });
+    iframe = document.createElement('iframe');
+    iframe.src = chrome.extension.getURL('sidebar.html');
+    resizable_div.appendChild(iframe);
 }
 
 function off() {
   console.log("off");
-  $('#' + DIV_ID).remove();
-  $('#' + PAGE_ID).replaceWith($('#' + PAGE_ID).contents());
+  while($('#' + DIV_ID).length > 0 || $('#' + PAGE_ID).length > 0) {
+    $('#' + DIV_ID).remove();
+    $('#' + PAGE_ID).replaceWith($('#' + PAGE_ID).contents());
+  }
 }
 
-function resizePage() {
-  $('#' + PAGE_ID).css({width: $('body').innerWidth() - $('#' + DIV_ID).outerWidth()});
+function resizePage(div_width) {
+  div_width = typeof div_width != 'undefined' ? div_width : $('#' + DIV_ID).outerWidth();
+  console.log($('body').innerWidth());
+  console.log(div_width);
+  $('#' + PAGE_ID).css({width: $('body').innerWidth() - div_width});
+  console.log($('#' + PAGE_ID).css('width'));
 }
 
 function isset(key) {
