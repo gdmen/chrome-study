@@ -1,3 +1,8 @@
+#study-guide-page {
+  float: left;
+  min-height: 100%;
+}
+
 #study-guide-sidebar {
   width: 300px;
   height: 100%;
