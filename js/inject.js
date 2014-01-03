@@ -65,11 +65,16 @@ function on() {
     $('#study-guide-sidebar').resizable({
       handles: 'w',
       minWidth: MIN_WIDTH,
+      start: function(event, ui) {
+        $('#' + DIV_ID + ' iframe').css('pointer-events', 'none');
+      },
       resize: function(event, ui) {
         $(this).css({left:''});
+        //resizePage();
       },
       stop: function(event, ui) {
         $(this).css({left:''});
+        $('#' + DIV_ID + ' iframe').css('pointer-events', 'auto');
         resizePage();
       }
     });
@@ -88,10 +93,10 @@ function off() {
 
 function resizePage(div_width) {
   div_width = typeof div_width != 'undefined' ? div_width : $('#' + DIV_ID).outerWidth();
-  console.log($('body').innerWidth());
-  console.log(div_width);
+  //console.log($('body').innerWidth());
+  //console.log(div_width);
   $('#' + PAGE_ID).css({width: $('body').innerWidth() - div_width});
-  console.log($('#' + PAGE_ID).css('width'));
+  //console.log($('#' + PAGE_ID).css('width'));
 }
 
 function isset(key) {
