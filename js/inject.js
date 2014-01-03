@@ -14,7 +14,7 @@
     document.body.appendChild(resizable_div);
     resizePage();
     $('#study-guide-sidebar').resizable({
-      handles: 'n,w,s,e',
+      handles: 'w',
       minWidth: 300,
       resize: function(event, ui) {
         $(this).css({left:''});

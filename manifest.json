@@ -16,8 +16,6 @@
     "default_icon": "images/icon.png"
   },
   "web_accessible_resources": [
-    "sidebar.html",
-    "js/libs/jquery.min.js",
-    "js/libs/jquery-ui.min.js"
+    "sidebar.html"
   ]
 }
