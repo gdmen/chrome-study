@@ -1,86 +1,53 @@
-DIV_ID = "study-guide-sidebar";
-PAGE_ID = "study-guide-page";
+var DIV_ID = "study-guide-sidebar";
+var PAGE_ID = "study-guide-page";
 
-STATE_KEY = 'study-guide-toggle';
-
-STARTING_WIDTH = 300;
-MIN_WIDTH = STARTING_WIDTH;
-
-if(!isset(STATE_KEY)) {
-  console.log("not set");
-  setLocal(STATE_KEY, false);
-  setSidebar();
-}
+var STARTING_WIDTH = 300;
+var MIN_WIDTH = STARTING_WIDTH;
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if(request.greeting == "toggle") {
-    console.log("toggle-msg");
-    toggle();
-  } else if(request.greeting == "set") {
-    console.log("set-msg");
-    setSidebar();
+  if(request.greeting == "on") {
+    console.log("on-msg");
+    on();
+  } else if(request.greeting == "off") {
+    console.log("off-msg");
+    off();
   } else {
-    console.log(request.greeting);
+    console.log("UNKNOWN: " + request.greeting);
   }
 });
 
-function toggle() {
-  console.log("toggle");
-  var enabled = getLocal(STATE_KEY);
-  if(enabled) {
-    console.log("togg-off");
-    setLocal(STATE_KEY, false);
-  } else {
-    console.log("togg-on");
-    setLocal(STATE_KEY, true);
-  }
-  setSidebar();
-}
-
-function setSidebar() {
-  function _setSidebar() {
-    var enabled = getLocal(STATE_KEY);
-    if(enabled) {
-      on();
-    } else {
-      off();
-    }
-  }
-  $(_setSidebar());
-}
-
 function on() {
   console.log("on");
-    off();
-    chrome.runtime.sendMessage({greeting: "inject"}, function(response) {
-    console.log("CSS INJECTED!");});
-    // Inject container
-    console.log("injecting?");
-    $('body').wrapInner('<div id="' + PAGE_ID + '"/>');
-    resizable_div = document.createElement("div");
-    resizable_div.id = DIV_ID;
-    document.body.appendChild(resizable_div);
-    $('#' + DIV_ID).css({width: STARTING_WIDTH});
-    resizePage();
-    $('#study-guide-sidebar').resizable({
-      handles: 'w',
-      minWidth: MIN_WIDTH,
-      start: function(event, ui) {
-        $('#' + DIV_ID + ' iframe').css('pointer-events', 'none');
-      },
-      resize: function(event, ui) {
-        $(this).css({left:''});
-        //resizePage();
-      },
-      stop: function(event, ui) {
-        $(this).css({left:''});
-        $('#' + DIV_ID + ' iframe').css('pointer-events', 'auto');
-        resizePage();
-      }
-    });
-    iframe = document.createElement('iframe');
-    iframe.src = chrome.extension.getURL('sidebar.html');
-    resizable_div.appendChild(iframe);
+  off();
+  chrome.runtime.sendMessage({greeting: "inject"}, function(response) {
+  console.log("CSS INJECTED!");});
+  // Inject container
+  console.log("injecting?");
+  $('body').wrapInner('<div id="' + PAGE_ID + '"/>');
+  resizable_div = document.createElement("div");
+  resizable_div.id = DIV_ID;
+  document.body.appendChild(resizable_div);
+  $('#' + DIV_ID).css({width: STARTING_WIDTH});
+  resizePage();
+  $('#study-guide-sidebar').resizable({
+    handles: 'w',
+    minWidth: MIN_WIDTH,
+    start: function(event, ui) {
+      $('#' + DIV_ID + ' iframe').css('pointer-events', 'none');
+    },
+    resize: function(event, ui) {
+      $(this).css({left:''});
+      //resizePage();
+    },
+    stop: function(event, ui) {
+      $(this).css({left:''});
+      $('#' + DIV_ID + ' iframe').css('pointer-events', 'auto');
+      resizePage();
+    }
+  });
+  iframe = document.createElement('iframe');
+  iframe.src = chrome.extension.getURL('sidebar.html');
+  resizable_div.appendChild(iframe);
 }
 
 function off() {
@@ -97,30 +64,4 @@ function resizePage(div_width) {
   //console.log(div_width);
   $('#' + PAGE_ID).css({width: $('body').innerWidth() - div_width});
   //console.log($('#' + PAGE_ID).css('width'));
-}
-
-function isset(key) {
-  return !(localStorage.getItem(key) === null);
-}
-/*
- * Sets to local storage
- * @params:
- *    - key
- *    - value
- * @returns:
- *    none
- */
-function setLocal(key, value){
-  localStorage[key] = value;
-}
-/*
- * Gets from local storage
- * @params:
- *    - key
- * @returns:
- *    - value on presence
- *    - undefined on absence
- */
-function getLocal(key){
-  return JSON.parse(localStorage[key]);
 }
