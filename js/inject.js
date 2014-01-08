@@ -5,21 +5,24 @@ var STARTING_WIDTH = 300;
 var MIN_WIDTH = STARTING_WIDTH;
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if(request.greeting == "on") {
+  if(request.cmd == "on") {
     console.log("on-msg");
     on();
-  } else if(request.greeting == "off") {
+  } else if(request.cmd == "off") {
     console.log("off-msg");
     off();
-  } else {
-    console.log("UNKNOWN: " + request.greeting);
+  } else if(request.cmd == "bookmark_dump") {
+    console.log("bookmark_dump-msg");
+    console.log(JSON.parse(request.payload));
+  }else {
+    console.log("UNKNOWN: " + request.cmd);
   }
 });
 
 function on() {
   console.log("on");
   off();
-  chrome.runtime.sendMessage({greeting: "inject"}, function(response) {
+  chrome.runtime.sendMessage({cmd: "inject"}, function(response) {
   console.log("CSS INJECTED!");});
   // Inject container
   console.log("injecting?");

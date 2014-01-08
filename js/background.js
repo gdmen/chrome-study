@@ -31,31 +31,30 @@ function delLocal(key) {
 chrome.browserAction.onClicked.addListener(function(tab) {
   console.log("onClicked");
   toggle(tab.id);
-  msgActiveTab(getToggle(tab.id) ? "on" : "off");
+  msgTab(tab.id, { cmd: getToggle(tab.id) ? "on" : "off" });
+  sendBookmarks(tab.id);
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   console.log("onUpdated");
-  msgActiveTab(getToggle(tab.id) ? "on" : "off");
+  msgTab(tab.id, { cmd: getToggle(tab.id) ? "on" : "off" });
 });
 
 chrome.tabs.onCreated.addListener(function(tab) {
   console.log("onCreated");
-  msgActiveTab(getToggle(tab.id) ? "on" : "off");
+  msgTab(tab.id, { cmd: getToggle(tab.id) ? "on" : "off" });
 });
 
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
   delLocal(STATE_KEY + tabId);
 });
 
-function msgActiveTab(msg) {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {greeting: msg});
-  });
+function msgTab(tab_id, msg) {
+  chrome.tabs.sendMessage(tab_id, msg);
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if(request.greeting == "inject") {
+  if(request.cmd == "inject") {
     console.log("INJECTING");
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.insertCSS(tabs[0].id, {file: "css/ui-lightness/jquery-ui.min.css"});
@@ -63,6 +62,24 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
     sendResponse({farewell: ""});
   } else {
-    console.log("UNKNOWN: " + request.greeting);
+    console.log("UNKNOWN: " + request.cmd);
   }
 });
+
+function sendBookmarks(tab_id) {
+  chrome.bookmarks.getTree(function(results) {
+    msgTab(tab_id, { cmd: "bookmark_dump", payload: JSON.stringify(recurseBookmarks(results[0].children), undefined, 2) });
+  });
+  function recurseBookmarks(nodes) {
+    var node_details = [];
+    var i;
+    for(i = 0; i < nodes.length; i++) {
+      if(!nodes[i].children) {
+        node_details.push({ title: nodes[i].title, url: nodes[i].url });
+      } else {
+        node_details.push({ title: nodes[i].title, children: recurseBookmarks(nodes[i].children) });
+      }
+    }
+    return node_details;
+  }
+}
